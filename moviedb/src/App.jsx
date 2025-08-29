@@ -1,35 +1,97 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+﻿import React, { useState } from 'react';
+import Search from './komponente/Search';
+import { MovieResults } from './komponente/MovieCard';
+import { fetchMovie, fetchPopularMovies, fetchTopRatedMovies } from './servisi/api';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [movies, setMovies] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [totalResults, setTotalResults] = useState(0);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleSearch = async (query) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const data = await fetchMovie(query);
+            setMovies(data.results);
+            setTotalResults(data.total_results);
+        } catch (err) {
+            setError(err.message);
+            setMovies([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePopular = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const data = await fetchPopularMovies(1);
+            setMovies(data.results);
+            setTotalResults(data.total_results);
+        } catch (e) {
+            setError(e.message);
+            setMovies([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleMostRated = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const data = await fetchTopRatedMovies(1);
+            setMovies(data.results);
+            setTotalResults(data.total_results);
+        } catch (e) {
+            setError(e.message);
+            setMovies([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-800">
+            <div className="static-bg"></div>
+
+            <div className="container py-8 relative z-10">
+                <h1 className="text-gradient text-shadow">
+                    🎬 Movie Database
+                </h1>
+
+
+                <div className="max-w-2xl mx-auto mb-8">
+                    <Search onSearch={handleSearch} />
+                </div>
+                <div className="buttons">
+                    <button
+                        onClick={handlePopular}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow"
+                    >
+                        Prikaži popularne filmove
+                    </button>
+                    <button
+                        onClick={handleMostRated}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow"
+                    >
+                        Prikaži najbolje ocijenjene filmove
+                    </button>
+                </div>
+                <MovieResults
+                    movies={movies}
+                    isLoading={isLoading}
+                    error={error}
+                />
+            </div>
+        </div>
+    );
 }
 
-export default App
+export default App;
