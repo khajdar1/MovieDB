@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 
-export default function MovieCard({ movie }) {
+export default function MovieCard({ movie, onClick }) {
     const imageBaseUrl = 'https://image.tmdb.org/t/p/w500';
 
     const posterUrl = movie.poster_path
@@ -34,8 +34,18 @@ export default function MovieCard({ movie }) {
         return 'text-red-400';
     };
 
+    const handleClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('MovieCard clicked, movie ID:', movie.id);
+        onClick(movie.id);
+    };
+
     return (
-        <div className="movie-card glass-card hover:shadow-glow transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+        <div
+            onClick={handleClick}
+            className="movie-card glass-card hover:shadow-glow transition-all duration-500 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+        >
             <div className="relative group overflow-hidden rounded-t-[20px]">
                 <img
                     src={posterUrl}
@@ -97,7 +107,7 @@ export default function MovieCard({ movie }) {
     );
 }
 
-export function MovieResults({ movies, isLoading, error }) {
+export function MovieResults({ movies, isLoading, error, onMovieClick }) {
     if (isLoading) {
         return (
             <div className="flex justify-center items-center py-20">
@@ -134,11 +144,13 @@ export function MovieResults({ movies, isLoading, error }) {
     }
 
     return (
-        <div className="movie-results-container">
-            {movies.map((movie, index) => (
-                <div key={movie.id} className="movie-card-wrapper" style={{ animationDelay: `${index * 0.05}s` }}>
-                    <MovieCard movie={movie} />
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-4">
+            {movies.map((movie) => (
+                <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                    onClick={onMovieClick}
+                />
             ))}
         </div>
     );

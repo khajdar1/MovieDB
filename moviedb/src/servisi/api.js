@@ -143,7 +143,6 @@ export async function fetchTopRatedMovies(page = 1) {
     }
 }
 
-/*
 export async function fetchMovieDetails(movieId) {
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -170,5 +169,3 @@ export async function fetchMovieDetails(movieId) {
         throw error;
     }
 }
-
-    */
